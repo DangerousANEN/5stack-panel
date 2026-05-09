@@ -15,3 +15,14 @@ resources:
   - volumes
   - nginx
   - backups
+
+# Pin api/web container images to this fork's GHCR. The streamer pod image is
+# resolved at runtime by the api (env GAME_STREAMER_IMAGE in api-config), so it
+# is not re-mapped here.
+images:
+  - name: ghcr.io/5stackgg/api
+    newName: ghcr.io/dangerousanen/api
+    newTag: latest
+  - name: ghcr.io/5stackgg/web
+    newName: ghcr.io/dangerousanen/web
+    newTag: latest

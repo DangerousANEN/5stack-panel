@@ -9,6 +9,7 @@ resources:
   - ingress-ws.yaml
   - ingress-relay.yaml
   - ingress-file-manager.yaml
+  - ingress-hud-stream.yaml
   - rbac/service-accounts.yaml
   - rbac/cluster-role-binding.yaml
   - rbac/cluster-role.yaml
