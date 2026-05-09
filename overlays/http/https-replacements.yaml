@@ -191,6 +191,26 @@ replacements:
           name: 5stack-ssl
         fieldPaths:
           - spec.dnsNames.6
+  - source:
+      kind: ConfigMap
+      name: api-config
+      fieldPath: data.HUD_DOMAIN
+    targets:
+      - select:
+          kind: Ingress
+          name: hud-stream
+        fieldPaths:
+          - spec.rules.0.host
+      - select:
+          kind: Ingress
+          name: hud-stream
+        fieldPaths:
+          - spec.tls.0.hosts.0
+      - select:
+          kind: Certificate
+          name: 5stack-ssl
+        fieldPaths:
+          - spec.dnsNames.7
 patches:
   - target:
       group: networking.k8s.io
@@ -239,4 +259,10 @@ patches:
       version: v1
       kind: Ingress
       name: file-manager
+    path: ingress-patch.yaml
+  - target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: hud-stream
     path: ingress-patch.yaml
