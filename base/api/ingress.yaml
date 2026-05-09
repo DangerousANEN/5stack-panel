@@ -96,6 +96,27 @@ spec:
                   number: 5585
             path: /branding
             pathType: Prefix
+          - backend:
+              service:
+                name: api
+                port:
+                  number: 5585
+            path: /huds
+            pathType: Prefix
+          - backend:
+              service:
+                name: api
+                port:
+                  number: 5585
+            path: /intros
+            pathType: Prefix
+          - backend:
+              service:
+                name: api
+                port:
+                  number: 5585
+            path: /game-streamer
+            pathType: Prefix
     - host: $(WEB_DOMAIN)
       http:
         paths:
