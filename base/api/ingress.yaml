@@ -117,6 +117,19 @@ spec:
                   number: 5585
             path: /game-streamer
             pathType: Prefix
+          - backend:
+              service:
+                name: api
+                port:
+                  number: 5585
+            # Public OBS Browser Source HUD overlay state endpoint
+            # (no auth). Consumed by /overlay/hud/<matchId> on the
+            # web side, which is fetched directly by OBS — but the
+            # api response itself is also fetched from there. Both
+            # the page and the api route must be reachable from
+            # tournament operators' OBS without an SSO cookie.
+            path: /overlay
+            pathType: Prefix
     - host: $(WEB_DOMAIN)
       http:
         paths:
