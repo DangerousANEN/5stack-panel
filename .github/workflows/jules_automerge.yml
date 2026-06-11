@@ -1,49 +1,43 @@
-name: 1. Auto-Validate and Merge Jules PRs
+name: "1. Auto-Validate and Merge Jules PRs"
 
 on:
-pull_request:
-branches:
-- main
+  pull_request:
+    branches:
+      - main
 
 permissions:
-contents: write
-pull-requests: write
+  contents: write
+  pull-requests: write
 
 jobs:
-test-and-merge:
-runs-on: ubuntu-latest
+  test-and-merge:
+    runs-on: ubuntu-latest
 
-```
-if: >
-  github.event.pull_request.user.login == 'google-jules[bot]' ||
-  contains(github.event.pull_request.labels.*.name, 'jules')
+    if: >
+      github.event.pull_request.user.login == 'google-jules[bot]' ||
+      contains(github.event.pull_request.labels.*.name, 'jules')
 
-steps:
-  - uses: actions/checkout@v4
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-  - uses: actions/setup-python@v5
-    with:
-      python-version: '3.11'
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-  - name: Install dependencies
-    run: |
-      pip install pytest
-      if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Install dependencies
+        run: |
+          pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-  - name: Run tests if available
-    run: |
-      if [ -d tests ]; then
-        pytest || exit 1
-      else
-        echo "No tests found"
-      fi
+      - name: Run tests
+        run: |
+          if [ -d tests ]; then pytest; else echo "No tests found"; fi
 
-  - name: Merge PR
-    if: success()
-    env:
-      GH_TOKEN: ${{ secrets.PAT }}
-    run: |
-      gh pr merge ${{ github.event.pull_request.number }} \
-        --squash \
-        --delete-branch
-```
+      - name: Merge PR
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}
+        run: |
+          gh pr merge ${{ github.event.pull_request.number }} --squash --delete-branch
