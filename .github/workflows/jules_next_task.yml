@@ -1,128 +1,69 @@
-name: 2. Jules Autonomous Improvement Loop
+name: "2. Jules Autonomous Loop"
 
 on:
-pull_request:
-types:
-- closed
+  pull_request:
+    types:
+      - closed
 
-schedule:
-- cron: '0 */6 * * *'
+  schedule:
+    - cron: "0 */6 * * *"
 
-workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-next-task:
-runs-on: ubuntu-latest
+  next-task:
+    runs-on: ubuntu-latest
 
-```
-if: >
-  github.event_name == 'workflow_dispatch' ||
-  github.event_name == 'schedule' ||
-  (github.event.pull_request.merged == true &&
-   (github.event.pull_request.user.login == 'google-jules[bot]' ||
-    contains(github.event.pull_request.labels.*.name, 'jules')))
+    if: github.event_name == 'workflow_dispatch' ||
+        github.event_name == 'schedule' ||
+        (github.event.pull_request.merged == true &&
+         (github.event.pull_request.user.login == 'google-jules[bot]' ||
+          contains(github.event.pull_request.labels.*.name, 'jules')))
 
-steps:
-  - name: Trigger Google Jules
-    run: |
-      PROMPT=$(cat <<'EOF'
-      You are the autonomous maintainer of the 5Stack ecosystem.
+    steps:
+      - name: Trigger Jules
+        env:
+          PROMPT: |
+            You are the autonomous maintainer of the 5Stack ecosystem.
 
-      Repositories:
+            Repositories:
+            - 5stack-panel
+            - web
+            - api
+            - game-streamer
+            - game-server
 
-      - 5stack-panel
-      - web
-      - api
-      - game-streamer
-      - game-server
+            Goal: continuously improve CS2 tournament platform.
 
-      PROJECT CONTEXT
+            Loop:
+            1. analyze repo
+            2. detect issues
+            3. pick highest value task
+            4. implement fully
+            5. add tests
+            6. update docs
+            7. create ONE PR
 
-      This ecosystem is used for professional Counter-Strike 2 tournaments.
+            Rules:
+            - do not modify secrets
+            - keep changes scoped
+            - prefer small improvements
 
-      Long-term goals:
-
-      - custom HUD system
-      - multiple HUD outputs
-      - OBS integration
-      - observer scenes
-      - veto streaming
-      - grenade camera
-      - freeze-time overlays
-      - Russian localization
-      - paid tournaments
-      - organizer approval workflow
-      - tournament automation
-
-      AUTONOMOUS EXECUTION
-
-      On every run:
-
-      1. Analyze repository structure.
-      2. Analyze branches.
-      3. Analyze documentation.
-      4. Analyze issues and TODO comments.
-      5. Detect bugs, missing features and technical debt.
-      6. Select the highest-value improvement.
-      7. Implement it completely.
-      8. Add tests when applicable.
-      9. Update documentation.
-      10. Create exactly one PR.
-
-      IMPORTANT
-
-      If unfinished work exists in another branch,
-      continue that work instead of duplicating it.
-
-      If no task exists,
-      generate your own task and implement it.
-
-      Prioritize:
-
-      1. broken functionality
-      2. tournament workflow improvements
-      3. streaming improvements
-      4. localization
-      5. UX improvements
-      6. technical debt
-
-      Determine whether this repository is:
-
-      - frontend
-      - backend
-      - streaming
-      - orchestration
-      - administration
-
-      and act accordingly.
-
-      Never stop because there is no task list.
-
-      Always create exactly one focused PR.
-
-      Do not modify secrets or credentials.
-
-      Be careful with infrastructure and deployment files.
-
-      EOF
-      )
-
-      curl -f 'https://jules.googleapis.com/v1alpha/sessions' \
-        -X POST \
-        -H "Content-Type: application/json" \
-        -H "X-Goog-Api-Key: ${{ secrets.JULES_API_KEY }}" \
-        -d "$(jq -n \
-          --arg prompt "$PROMPT" \
-          --arg source "sources/github/${{ github.repository }}" \
-          '{
-            "prompt": $prompt,
-            "sourceContext": {
-              "source": $source,
-              "githubRepoContext": {
-                "startingBranch": "main"
-              }
-            },
-            "automationMode": "AUTO_CREATE_PR",
-            "title": "Autonomous Repository Improvement"
-          }')"
-```
+        run: |
+          curl -X POST "https://jules.googleapis.com/v1alpha/sessions" \
+            -H "Content-Type: application/json" \
+            -H "X-Goog-Api-Key: ${{ secrets.JULES_API_KEY }}" \
+            -d "$(jq -n \
+              --arg prompt "$PROMPT" \
+              --arg source "sources/github/${{ github.repository }}" \
+              '{
+                prompt: $prompt,
+                sourceContext: {
+                  source: $source,
+                  githubRepoContext: {
+                    startingBranch: "main"
+                  }
+                },
+                automationMode: "AUTO_CREATE_PR",
+                title: "Autonomous Improvement"
+              }')"
