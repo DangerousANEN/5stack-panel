@@ -12,6 +12,7 @@ checkout_repos() {
         "web https://github.com/5stackgg/web.git"
         "game-server https://github.com/5stackgg/game-server.git"
         "game-server-node-connector https://github.com/5stackgg/game-server-node-connector.git"
+        "game-streamer https://github.com/5stackgg/game-streamer.git"
     )
     
     echo "Checking for required repositories in: $PARENT_DIR"
