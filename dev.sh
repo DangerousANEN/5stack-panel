@@ -40,7 +40,7 @@ if k3d cluster list 5stack-dev 2>/dev/null | grep -q '5stack-dev'; then
     k3d cluster start 5stack-dev
   fi
 else
-  rm ~/.kube/5stack-dev
+  rm -f ~/.kube/5stack-dev
   k3d cluster create 5stack-dev \
     --k3s-arg "--disable=traefik@server:0" \
     --kubeconfig-switch-context=false \
@@ -71,6 +71,6 @@ setup_steam_web_api_key "overlays/dev/secrets/steam-secrets.env"
 
 setup_fixtures "overlays/dev/config/api-config.env"
 
-docker exec -it k3d-5stack-dev-server-0 sh -c "mkdir -p mkdir -p /opt/5stack/dev /opt/5stack/demos /opt/5stack/steamcmd /opt/5stack/serverfiles /opt/5stack/serverfiles-csgo /opt/5stack/timescaledb /opt/5stack/typesense /opt/5stack/minio /opt/5stack/custom-plugins /var/lib/rancher/k3s/agent/pod-manifests && echo Directories created successfully"
+docker exec -it k3d-5stack-dev-server-0 sh -c "mkdir -p /opt/5stack/dev /opt/5stack/demos /opt/5stack/steamcmd /opt/5stack/serverfiles /opt/5stack/serverfiles-csgo /opt/5stack/timescaledb /opt/5stack/typesense /opt/5stack/minio /opt/5stack/custom-plugins /var/lib/rancher/k3s/agent/pod-manifests && echo Directories created successfully"
 
 tilt up
