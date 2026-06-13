@@ -19,22 +19,22 @@ watch_ssl_status() {
         date
         echo
         echo "=== Certificates (namespace: 5stack) ==="
-        kubectl --kubeconfig=$KUBECONFIG get certificates.cert-manager.io -n 5stack || true
+        kubectl --kubeconfig="$KUBECONFIG" get certificates.cert-manager.io -n 5stack || true
         echo
         echo "=== Orders (namespace: 5stack) ==="
-        kubectl --kubeconfig=$KUBECONFIG get orders.acme.cert-manager.io -n 5stack || true
+        kubectl --kubeconfig="$KUBECONFIG" get orders.acme.cert-manager.io -n 5stack || true
         echo
         echo "=== Challenges (namespace: 5stack) ==="
         echo "NAME                                STATE     DOMAIN              AGE"
-        challenges=$(kubectl --kubeconfig=$KUBECONFIG get challenges.acme.cert-manager.io -n 5stack -o jsonpath='{.items[*].metadata.name}' 2>/dev/null)
+        challenges=$(kubectl --kubeconfig="$KUBECONFIG" get challenges.acme.cert-manager.io -n 5stack -o jsonpath='{.items[*].metadata.name}' 2>/dev/null)
         for ch in $challenges; do
             # Single line with the standard challenge info (no header)
-            line=$(kubectl --kubeconfig=$KUBECONFIG get challenge "$ch" -n 5stack --no-headers 2>/dev/null || true)
+            line=$(kubectl --kubeconfig="$KUBECONFIG" get challenge "$ch" -n 5stack --no-headers 2>/dev/null || true)
             [ -z "$line" ] && continue
             echo "$line"
 
             # Latest event for this specific challenge
-            latest_event=$(kubectl --kubeconfig=$KUBECONFIG get events -n 5stack \
+            latest_event=$(kubectl --kubeconfig="$KUBECONFIG" get events -n 5stack \
                 --field-selector involvedObject.kind=Challenge,involvedObject.name="$ch" \
                 --sort-by=.lastTimestamp -o json 2>/dev/null | \
                 jq -r 'if (.items | length) > 0 then .items[-1] | "\(.type) \(.reason): \(.message)" else "" end' 2>/dev/null)
@@ -46,7 +46,7 @@ watch_ssl_status() {
         echo
         
         # Check if 5stack-ssl certificate is ready and exit if so
-        ready_status=$(kubectl --kubeconfig=$KUBECONFIG get certificates.cert-manager.io 5stack-ssl -n 5stack --no-headers 2>/dev/null | awk '{print $2}' || echo "")
+        ready_status=$(kubectl --kubeconfig="$KUBECONFIG" get certificates.cert-manager.io 5stack-ssl -n 5stack --no-headers 2>/dev/null | awk '{print $2}' || echo "")
         
         if [ "$ready_status" = "True" ]; then
             echo "✓ 5stack-ssl certificate is ready!"
