@@ -39,11 +39,11 @@ fi
 
 source setup-env.sh "$@"
 
-host=$(kubectl --kubeconfig=$KUBECONFIG config view --minify -o jsonpath='{.clusters[0].cluster.server}')
-certificate=$(kubectl --kubeconfig=$KUBECONFIG config view --raw --minify -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' | base64 --decode)
+host=$(kubectl --kubeconfig="$KUBECONFIG" config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+certificate=$(kubectl --kubeconfig="$KUBECONFIG" config view --raw --minify -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' | base64 --decode)
 
 echo "Getting service account token for external-secrets..."
-SA_TOKEN=$(kubectl --kubeconfig=$KUBECONFIG create token 5stack -n 5stack)
+SA_TOKEN=$(kubectl --kubeconfig="$KUBECONFIG" create token 5stack -n 5stack)
 
 echo "Checking Kubernetes auth method..."
 if ! vault auth list | grep -q "^kubernetes/"; then
