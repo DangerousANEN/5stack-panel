@@ -29,7 +29,7 @@ read_masked() {
   local __prompt="$1" __outvar="$2"
   local __value="" __char
   echo -en "$__prompt"
-  while IFS= read -r -s -n 1 __char </dev/tty; do
+  while IFS= read -rs -n 1 __char </dev/tty; do
     if [ -z "$__char" ]; then
       break
     fi
