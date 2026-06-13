@@ -20,7 +20,7 @@ fi
 NODE_NAME=""
 
 get_all_nodes() {
-    kubectl --kubeconfig=$KUBECONFIG get nodes -o jsonpath='{.items[*].metadata.name}'
+    kubectl --kubeconfig="$KUBECONFIG" get nodes -o jsonpath='{.items[*].metadata.name}'
 }
 
 select_node() {
@@ -30,18 +30,18 @@ select_node() {
     for i in "${!NODE_ARRAY[@]}"; do
         echo "$((i+1)). ${NODE_ARRAY[$i]}"
     done
-    read -p "Enter the number of the node: " NODE_INDEX
+    read -r -p "Enter the number of the node: " NODE_INDEX
     NODE_NAME=${NODE_ARRAY[$((NODE_INDEX-1))]}
     echo "Selected node: $NODE_NAME"
 }
 
 add_node_selector() {
-    kubectl --kubeconfig=$KUBECONFIG label node $NODE_NAME 5stack-$CUSTOM_DIR=true
+    kubectl --kubeconfig="$KUBECONFIG" label node "$NODE_NAME" "5stack-$CUSTOM_DIR=true"
 }
 
 select_node
 add_node_selector
 
-./kustomize build ./custom/$CUSTOM_DIR | kubectl --kubeconfig=$KUBECONFIG apply -f - --kubeconfig=$KUBECONFIG
+./kustomize build ./custom/"$CUSTOM_DIR" | kubectl --kubeconfig="$KUBECONFIG" apply -f - --kubeconfig="$KUBECONFIG"
 
 echo "Custom resource deployed successfully"

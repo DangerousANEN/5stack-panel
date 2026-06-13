@@ -32,10 +32,10 @@ echo "         - Client Secret ${C_WARN}(shown only once!)${C_RESET}"
 echo
 
 echo -e "${C_STEP}Enter your Tailscale OAuth Client ID:${C_RESET}"
-read TAILSCALE_CLIENT_ID
+read -r TAILSCALE_CLIENT_ID
 while [ -z "$TAILSCALE_CLIENT_ID" ]; do
     warn "Client ID cannot be empty. Please enter your OAuth Client ID:"
-    read TAILSCALE_CLIENT_ID
+    read -r TAILSCALE_CLIENT_ID
 done
 
 while true; do
@@ -59,9 +59,7 @@ update_env_var "overlays/config/api-config.env" "TAILSCALE_CLIENT_ID" "$TAILSCAL
 update_env_var "overlays/local-secrets/tailscale-secrets.env" "TAILSCALE_SECRET_ID" "$TAILSCALE_CLIENT_SECRET"
 
 step "Configuring ACL rules for fivestack tag"
-update_acl_for_fivestack "$ACCESS_TOKEN"
-
-if [ $? -eq 0 ]; then
+if update_acl_for_fivestack "$ACCESS_TOKEN"; then
     ok "ACL configured (10.42.0.0/16 subnet with auto-approvers)"
 else
     warn "ACL configuration failed. You may need to configure ACL manually."
@@ -77,7 +75,7 @@ fi
 ok "auth key generated"
 
 step "Joining tailscale network"
-tailscale up --authkey=$TAILSCALE_AUTH_KEY --accept-routes
+tailscale up --authkey="$TAILSCALE_AUTH_KEY" --accept-routes
 
 step "Waiting for tailscale IP"
 for i in {1..60}; do
@@ -99,7 +97,7 @@ if [ -z "$TAILSCALE_NODE_IP" ]; then
     warn "https://login.tailscale.com/admin/machines"
     while true; do
         echo -e "${C_STEP}Enter the Tailscale node IP address:${C_RESET}"
-        read TAILSCALE_NODE_IP </dev/tty
+        read -r TAILSCALE_NODE_IP </dev/tty
         if [ -n "$TAILSCALE_NODE_IP" ]; then
             break
         fi
