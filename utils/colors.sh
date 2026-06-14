@@ -8,7 +8,9 @@ if [ -t 1 ]; then
   C_ERR=$'\033[0;31m'
   C_DIM=$'\033[2m'
 else
-  C_RESET=''; C_STEP=''; C_OK=''; C_WARN=''; C_ERR=''; C_DIM=''
+  C_RESET=''; C_STEP=''; C_OK=''; C_WARN=''; C_ERR='';
+  # shellcheck disable=SC2034
+  C_DIM=''
 fi
 
 step() { echo; echo "${C_STEP}==> $1${C_RESET}"; }
