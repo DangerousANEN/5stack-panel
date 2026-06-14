@@ -14,7 +14,8 @@ get_oauth_token() {
         return 1
     fi
 
-    local response=$(curl -s -X POST "https://api.tailscale.com/api/v2/oauth/token" \
+    local response
+    response=$(curl -s -X POST "https://api.tailscale.com/api/v2/oauth/token" \
         -d "client_id=${client_id}" \
         -d "client_secret=${client_secret}" \
         -d "grant_type=client_credentials")
@@ -25,7 +26,8 @@ get_oauth_token() {
         return 1
     fi
 
-    local token=$(echo "$response" | grep -o '"access_token":"[^"]*"' | cut -d'"' -f4)
+    local token
+    token=$(echo "$response" | grep -o '"access_token":"[^"]*"' | cut -d'"' -f4)
 
     if [ -z "$token" ]; then
         echo "Error: No access token in response" >&2
@@ -43,7 +45,8 @@ create_auth_key() {
         return 1
     fi
 
-    local response=$(curl -s -X POST "${TAILSCALE_API_BASE}/tailnet/-/keys" \
+    local response
+    response=$(curl -s -X POST "${TAILSCALE_API_BASE}/tailnet/-/keys" \
         -H "Authorization: Bearer ${access_token}" \
         -H "Content-Type: application/json" \
         -d '{
@@ -67,7 +70,8 @@ create_auth_key() {
         return 1
     fi
 
-    local key=$(echo "$response" | grep -o '"key":"[^"]*"' | cut -d'"' -f4)
+    local key
+    key=$(echo "$response" | grep -o '"key":"[^"]*"' | cut -d'"' -f4)
 
     if [ -z "$key" ]; then
         echo "Error: No auth key in response" >&2
@@ -85,14 +89,18 @@ update_acl_for_fivestack() {
         return 1
     fi
 
-    local acl_response=$(curl -s -D - -X GET "${TAILSCALE_API_BASE}/tailnet/-/acl" \
+    local acl_response
+    acl_response=$(curl -s -D - -X GET "${TAILSCALE_API_BASE}/tailnet/-/acl" \
         -H "Authorization: Bearer ${access_token}" \
         -H "Accept: application/json")
 
-    local headers=$(echo "$acl_response" | sed '/^\r$/q')
-    local body=$(echo "$acl_response" | sed '1,/^\r$/d')
+    local headers
+    headers=$(echo "$acl_response" | sed '/^\r$/q')
+    local body
+    body=$(echo "$acl_response" | sed '1,/^\r$/d')
 
-    local etag=$(echo "$headers" | grep -i '^etag:' | awk '{print $2}' | tr -d $'\r\n"')
+    local etag
+    etag=$(echo "$headers" | grep -i '^etag:' | awk '{print $2}' | tr -d $'\r\n"')
     if [ -z "$etag" ]; then
         echo "Error: Could not extract ACL ETag. Cannot ensure concurrency-safe update." >&2
         return 1
@@ -131,7 +139,8 @@ update_acl_for_fivestack() {
         )
     ')
 
-    local response=$(curl -s -X POST "${TAILSCALE_API_BASE}/tailnet/-/acl" \
+    local response
+    response=$(curl -s -X POST "${TAILSCALE_API_BASE}/tailnet/-/acl" \
         -H "Authorization: Bearer ${access_token}" \
         -H "Content-Type: application/json" \
         -H "If-Match: \"${etag}\"" \
