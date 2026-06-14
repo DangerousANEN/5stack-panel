@@ -46,3 +46,4 @@ read_masked() {
   echo
   printf -v "$__outvar" '%s' "$__value"
 }
+export C_DIM

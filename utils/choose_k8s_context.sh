@@ -2,7 +2,7 @@
 
 choose_k8s_context() {
   echo "Detecting available Kubernetes contexts..."
-  contexts=($(kubectl config get-contexts -o name))
+  mapfile -t contexts < <(kubectl config get-contexts -o name)
 
   if [ ${#contexts[@]} -eq 0 ]; then
     echo "No Kubernetes contexts found in kubeconfig."
