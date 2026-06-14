@@ -2,6 +2,7 @@
 
 choose_k8s_context() {
   echo "Detecting available Kubernetes contexts..."
+  # shellcheck disable=SC2207
   contexts=($(kubectl config get-contexts -o name))
 
   if [ ${#contexts[@]} -eq 0 ]; then

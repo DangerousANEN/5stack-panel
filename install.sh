@@ -51,7 +51,7 @@ step "Installing Ingress Nginx (this may take a few minutes)"
 install_ingress_nginx true
 ok "ingress-nginx installed"
 
-kubectl label node $(kubectl get nodes -o jsonpath='{.items[0].metadata.name}') 5stack-api=true 5stack-hasura=true 5stack-minio=true 5stack-timescaledb=true 5stack-redis=true 5stack-typesense=true 5stack-web=true
+kubectl label node "$(kubectl get nodes -o jsonpath='{.items[0].metadata.name}')" 5stack-api=true 5stack-hasura=true 5stack-minio=true 5stack-timescaledb=true 5stack-redis=true 5stack-typesense=true 5stack-web=true
 
 source update.sh "$@"
 
