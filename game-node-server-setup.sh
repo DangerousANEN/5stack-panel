@@ -80,7 +80,7 @@ step "Joining tailscale network"
 tailscale up --authkey=$TAILSCALE_AUTH_KEY --accept-routes
 
 step "Waiting for tailscale IP"
-for i in {1..60}; do
+for _ in {1..60}; do
     TAILSCALE_NODE_IP=$(tailscale ip -4 2>/dev/null | head -n 1)
     if [ -n "$TAILSCALE_NODE_IP" ]; then
         break

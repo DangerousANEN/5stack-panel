@@ -15,6 +15,7 @@ step() { echo; echo "${C_STEP}==> $1${C_RESET}"; }
 ok()   { echo "${C_OK}    $1${C_RESET}"; }
 warn() { echo "${C_WARN}    $1${C_RESET}"; }
 err()  { echo "${C_ERR}    $1${C_RESET}" >&2; }
+dim()  { echo "${C_DIM}    $1${C_RESET}"; }
 
 banner() {
   echo
