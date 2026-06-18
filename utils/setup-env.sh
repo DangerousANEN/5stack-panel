@@ -57,7 +57,7 @@ fi
 
 ask_reverse_proxy() {
     while true; do
-        read -p "Are you using a reverse proxy or cloudflare proxies ? (https://docs.5stack.gg/install/reverse-proxy) (y/n): " use_reverse_proxy
+        read -r -p "Are you using a reverse proxy or cloudflare proxies ? (https://docs.5stack.gg/install/reverse-proxy) (y/n): " use_reverse_proxy
         if [ "$use_reverse_proxy" = "y" ] || [ "$use_reverse_proxy" = "n" ]; then
             break
         fi
@@ -109,10 +109,11 @@ migrate_secrets_to_vault() {
         echo "Migrating $key to Vault"
         
         # Upload to Vault
-        local json_data=$(jq -n --arg k "$key" --arg v "$value" '{($k): $v}')
-        echo "$json_data" | vault kv patch "$vault_path" -
+        local json_data
+        json_data=$(jq -n --arg k "$key" --arg v "$value" '{($k): $v}')
 
-        if [ $? -eq 0 ]; then
+
+        if echo "$json_data" | vault kv patch "$vault_path" -; then
             echo "  ✓ Migrated $key to Vault"
             # Append to backup after successful upload
             echo "$key=$value" >> "${secret_file}.backup"
@@ -197,7 +198,7 @@ GAME_STREAM_DOMAIN=$(grep -h "^GAME_STREAM_DOMAIN=" overlays/config/api-config.e
 if [ -z "$WEB_DOMAIN" ] || [ -z "$WS_DOMAIN" ] || [ -z "$API_DOMAIN" ] || [ -z "$RELAY_DOMAIN" ] || [ -z "$DEMOS_DOMAIN" ] || [ -z "$GAME_STREAM_DOMAIN" ] || [ -z "$MAIL_FROM" ] || [ -z "$S3_CONSOLE_HOST" ] || [ -z "$TYPESENSE_HOST" ]; then
     if [ -z "$WEB_DOMAIN" ]; then
         echo "Base domain cannot be empty. Please enter your base domain (e.g. example.com):"
-        read WEB_DOMAIN
+        read -r WEB_DOMAIN
     fi
 
     if [ -z "$WEB_DOMAIN" ] || echo "$WEB_DOMAIN" | grep -q ' '; then
