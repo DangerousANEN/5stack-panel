@@ -66,6 +66,16 @@ replacements:
           - spec.rules.0.host
   - source:
       kind: ConfigMap
+      name: api-config
+      fieldPath: data.HUD_DOMAIN
+    targets:
+      - select:
+          kind: Ingress
+          name: hud-stream
+        fieldPaths:
+          - spec.rules.0.host
+  - source:
+      kind: ConfigMap
       name: s3-config
       fieldPath: data.S3_CONSOLE_HOST
     targets:
