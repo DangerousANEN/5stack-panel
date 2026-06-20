@@ -19,7 +19,7 @@ setup_k3s_token() {
     while [ -z "$K3S_TOKEN" ]; do
         echo "Please enter your K3S token (required for Kubernetes node connection)."
         echo "You can find it at: /var/lib/rancher/k3s/server/node-token"
-        read K3S_TOKEN
+        read -r K3S_TOKEN
     done
     
     # Update or add the token to the file

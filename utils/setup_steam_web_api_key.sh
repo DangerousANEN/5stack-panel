@@ -12,7 +12,7 @@ setup_steam_web_api_key() {
     
     while [ -z "$STEAM_WEB_API_KEY" ]; do
         echo "Please enter your Steam Web API key (required for Steam authentication). Get one at: https://steamcommunity.com/dev/apikey"
-        read STEAM_WEB_API_KEY
+        read -r STEAM_WEB_API_KEY
     done
     
     update_env_var "$secrets_file" "STEAM_WEB_API_KEY" "$STEAM_WEB_API_KEY"
