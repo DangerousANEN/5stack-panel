@@ -72,16 +72,16 @@ check_dev_dependencies() {
     done
     echo ""
     echo "Please install the missing dependencies:"
-    if [[ " ${missing_deps[@]} " =~ "Docker Desktop" ]]; then
+    if echo " ${missing_deps[*]} " | grep -q "Docker Desktop"; then
       echo "  - Docker Desktop: https://www.docker.com/products/docker-desktop/"
     fi
-    if [[ " ${missing_deps[@]} " =~ "k3d" ]]; then
+    if echo " ${missing_deps[*]} " | grep -q "k3d"; then
       echo "  - k3d: https://k3d.io/stable/#releases"
     fi
-    if [[ " ${missing_deps[@]} " =~ "mkcert" ]]; then
+    if echo " ${missing_deps[*]} " | grep -q "mkcert"; then
       echo "  - mkcert: https://github.com/FiloSottile/mkcert"
     fi
-    if [[ " ${missing_deps[@]} " =~ "tilt" ]]; then
+    if echo " ${missing_deps[*]} " | grep -q "tilt"; then
       echo "  - tilt: https://docs.tilt.dev/install.html"
     fi
     exit 1
