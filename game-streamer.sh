@@ -45,7 +45,7 @@ case "$VENDOR_INDEX" in
 esac
 
 step "Discovering cluster nodes"
-ALL_NODES=$(kubectl --kubeconfig=$KUBECONFIG get nodes -o jsonpath='{.items[*].metadata.name}')
+ALL_NODES=$(kubectl --kubeconfig="$KUBECONFIG" get nodes -o jsonpath='{.items[*].metadata.name}')
 ALL_NODES_ARR=()
 for node in $ALL_NODES; do ALL_NODES_ARR+=("$node"); done
 
@@ -70,10 +70,10 @@ done
 step "Labeling GPU nodes"
 for node in $ALL_NODES; do
     if echo " $GPU_NODES " | grep -q " $node "; then
-        kubectl --kubeconfig=$KUBECONFIG label node "$node" nvidia-gpu=true 5stack-game-streamer=true --overwrite >/dev/null
+        kubectl --kubeconfig="$KUBECONFIG" label node "$node" nvidia-gpu=true 5stack-game-streamer=true --overwrite >/dev/null
         ok "$node: labeled as GPU node"
     elif echo " $PREVIOUS_GPU_NODES " | grep -q " $node "; then
-        kubectl --kubeconfig=$KUBECONFIG label node "$node" nvidia-gpu- 5stack-game-streamer- >/dev/null 2>&1 || true
+        kubectl --kubeconfig="$KUBECONFIG" label node "$node" nvidia-gpu- 5stack-game-streamer- >/dev/null 2>&1 || true
         warn "$node: GPU labels removed"
     fi
 done
@@ -103,14 +103,14 @@ if [ -z "$STEAM_USER_CURRENT" ] || [ -z "$STEAM_PASSWORD_CURRENT" ]; then
 fi
 
 while [ -z "$STEAM_USER_CURRENT" ]; do
-    read -p "Steam username: " STEAM_USER_CURRENT
+    read -r -p "Steam username: " STEAM_USER_CURRENT
 done
 if [ "$STEAM_USER_CURRENT" != "$(grep -h "^STEAM_USER=" "$STEAM_SECRETS_FILE" | cut -d '=' -f2-)" ]; then
     update_env_var "$STEAM_SECRETS_FILE" "STEAM_USER" "$STEAM_USER_CURRENT"
 fi
 
 while [ -z "$STEAM_PASSWORD_CURRENT" ]; do
-    read -s -p "Steam password: " STEAM_PASSWORD_CURRENT
+    read -r -s -p "Steam password: " STEAM_PASSWORD_CURRENT
     echo ""
 done
 if [ "$STEAM_PASSWORD_CURRENT" != "$(grep -h "^STEAM_PASSWORD=" "$STEAM_SECRETS_FILE" | cut -d '=' -f2-)" ]; then
@@ -119,7 +119,7 @@ fi
 
 if [ -z "$GAME_STREAM_DOMAIN" ] || [ "$GAME_STREAM_DOMAIN" = "hls.example.com" ]; then
     DEFAULT_HLS="hls.$WEB_DOMAIN"
-    read -p "Enter the playback domain for game streams (default: $DEFAULT_HLS): " GAME_STREAM_DOMAIN
+    read -r -p "Enter the playback domain for game streams (default: $DEFAULT_HLS): " GAME_STREAM_DOMAIN
     GAME_STREAM_DOMAIN=${GAME_STREAM_DOMAIN:-$DEFAULT_HLS}
     if echo "$GAME_STREAM_DOMAIN" | grep -q ' '; then
         err "Invalid domain '$GAME_STREAM_DOMAIN'."
