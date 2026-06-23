@@ -17,7 +17,7 @@ setup_fixtures() {
     echo ""
     echo "Would you like to load fixture data? (sample players, matches, tournaments)"
     echo "This is useful for testing but can be skipped for a clean database."
-    read -p "(y/n): " answer
+    read -r -p "(y/n): " answer
 
     if [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
         update_env_var "$config_file" "LOAD_FIXTURES" "true"
