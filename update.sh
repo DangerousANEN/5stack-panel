@@ -4,16 +4,16 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils/utils.sh" "$@"
 
 if [ "$REVERSE_PROXY" = true ]; then
-    kubectl --kubeconfig=$KUBECONFIG delete certificate 5stack-ssl -n 5stack 2>/dev/null
+    kubectl --kubeconfig="$KUBECONFIG" delete certificate 5stack-ssl -n 5stack 2>/dev/null
 fi
 
 if [ "$REVERSE_PROXY" != true ]; then
     step "Installing cert-manager CRDs"
-    ./kustomize build overlays/cert-manager-crds | output_redirect kubectl --kubeconfig=$KUBECONFIG apply -f -
+    ./kustomize build overlays/cert-manager-crds | output_redirect kubectl --kubeconfig="$KUBECONFIG" apply -f -
 
-    output_redirect kubectl --kubeconfig=$KUBECONFIG wait --for=condition=Established crd/certificates.cert-manager.io --timeout=120s
-    output_redirect kubectl --kubeconfig=$KUBECONFIG wait --for=condition=Established crd/issuers.cert-manager.io --timeout=120s
-    output_redirect kubectl --kubeconfig=$KUBECONFIG wait --for=condition=Established crd/clusterissuers.cert-manager.io --timeout=120s
+    output_redirect kubectl --kubeconfig="$KUBECONFIG" wait --for=condition=Established crd/certificates.cert-manager.io --timeout=120s
+    output_redirect kubectl --kubeconfig="$KUBECONFIG" wait --for=condition=Established crd/issuers.cert-manager.io --timeout=120s
+    output_redirect kubectl --kubeconfig="$KUBECONFIG" wait --for=condition=Established crd/clusterissuers.cert-manager.io --timeout=120s
     ok "cert-manager CRDs ready"
 fi
 
@@ -55,31 +55,31 @@ ok "overlays generated"
 step "Applying kustomize overlay"
 if [ "$VAULT_MANAGER" = true ]; then
     if [ "$REVERSE_PROXY" = true ]; then
-        ./kustomize build overlays/vault-http | output_redirect kubectl --kubeconfig=$KUBECONFIG apply -f -
+        ./kustomize build overlays/vault-http | output_redirect kubectl --kubeconfig="$KUBECONFIG" apply -f -
     else
-        ./kustomize build overlays/vault-https | output_redirect kubectl --kubeconfig=$KUBECONFIG apply -f -
+        ./kustomize build overlays/vault-https | output_redirect kubectl --kubeconfig="$KUBECONFIG" apply -f -
     fi
 else
     if [ "$REVERSE_PROXY" = true ]; then
-        ./kustomize build overlays/local-secrets-http | output_redirect kubectl --kubeconfig=$KUBECONFIG apply -f -
+        ./kustomize build overlays/local-secrets-http | output_redirect kubectl --kubeconfig="$KUBECONFIG" apply -f -
     else
-        ./kustomize build overlays/local-secrets-https | output_redirect kubectl --kubeconfig=$KUBECONFIG apply -f -
+        ./kustomize build overlays/local-secrets-https | output_redirect kubectl --kubeconfig="$KUBECONFIG" apply -f -
     fi
 fi
 ok "overlay applied"
 
 step "Recycling stateful workloads"
-kubectl --kubeconfig=$KUBECONFIG delete deployment minio -n 5stack 2>/dev/null
-kubectl --kubeconfig=$KUBECONFIG delete deployment timescaledb -n 5stack  2>/dev/null
-kubectl --kubeconfig=$KUBECONFIG delete deployment typesense -n 5stack  2>/dev/null
-kubectl --kubeconfig=$KUBECONFIG delete deployment redis -n 5stack  2>/dev/null
+kubectl --kubeconfig="$KUBECONFIG" delete deployment minio -n 5stack 2>/dev/null
+kubectl --kubeconfig="$KUBECONFIG" delete deployment timescaledb -n 5stack  2>/dev/null
+kubectl --kubeconfig="$KUBECONFIG" delete deployment typesense -n 5stack  2>/dev/null
+kubectl --kubeconfig="$KUBECONFIG" delete deployment redis -n 5stack  2>/dev/null
 
 GIT_SHA=$(git rev-parse HEAD)
 
-kubectl --kubeconfig=$KUBECONFIG label node $(kubectl --kubeconfig=$KUBECONFIG get nodes --selector='node-role.kubernetes.io/control-plane' -o jsonpath='{.items[0].metadata.name}') 5stack-panel-version=$GIT_SHA --overwrite
+kubectl --kubeconfig="$KUBECONFIG" label node "$(kubectl --kubeconfig="$KUBECONFIG" get nodes --selector='node-role.kubernetes.io/control-plane' -o jsonpath='{.items[0].metadata.name}')" 5stack-panel-version="$GIT_SHA" --overwrite
 
 if [ "$GPU_VENDOR" = "nvidia" ] && [ -n "$GPU_NODES" ]; then
-    kubectl --kubeconfig=$KUBECONFIG label node $(kubectl --kubeconfig=$KUBECONFIG get nodes --selector='node-role.kubernetes.io/control-plane' -o jsonpath='{.items[0].metadata.name}') 5stack-mediamtx=true --overwrite
+    kubectl --kubeconfig="$KUBECONFIG" label node "$(kubectl --kubeconfig="$KUBECONFIG" get nodes --selector='node-role.kubernetes.io/control-plane' -o jsonpath='{.items[0].metadata.name}')" 5stack-mediamtx=true --overwrite
 fi
 
 if [ "$REVERSE_PROXY" = false ]; then
